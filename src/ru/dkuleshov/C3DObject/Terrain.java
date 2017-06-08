@@ -24,7 +24,7 @@ public class Terrain implements C3DObject
         //terrain = Primitives.getBox(20f, 1f);
         mesh = Primitives.getPlane(1, 1000f);
         mesh.rotateX((float)Math.PI / 2f);
-        mesh.translate(0f, 500f, 0f);
+        mesh.translate(0f, 100f, 0f);
         mesh.setTexture("grid");
         mesh.enableLazyTransformations();
         world.addObject(mesh);

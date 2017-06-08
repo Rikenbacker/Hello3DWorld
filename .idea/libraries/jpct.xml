@@ -3,7 +3,9 @@
     <CLASSES>
       <root url="jar://$PROJECT_DIR$/../../jpct/lib/jpct/jpct.jar!/" />
     </CLASSES>
-    <JAVADOC />
+    <JAVADOC>
+      <root url="file://$PROJECT_DIR$/../../jpct/doc/javadoc" />
+    </JAVADOC>
     <SOURCES />
   </library>
 </component>

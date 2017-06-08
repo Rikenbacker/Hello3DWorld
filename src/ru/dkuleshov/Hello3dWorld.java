@@ -2,12 +2,13 @@ package ru.dkuleshov;
 
 import com.threed.jpct.*;
 import java.io.*;
-import ru.dkuleshov.service.*;
 import com.threed.jpct.util.*;
 import java.awt.*;
 import java.awt.event.*;
 
 import ru.dkuleshov.C3DObject.*;
+import ru.dkuleshov.service.*;
+import ru.dkuleshov.gameObject.*;
 
 public class Hello3dWorld
 {
@@ -26,25 +27,20 @@ public class Hello3dWorld
     private MouseMapper mouseMapper = null;
     private int width=800;
     private int height=600;
-    private boolean isIdle=false;
-    private boolean exit=false;
+    private boolean isExit = false;
+    Rail rail = null;
+
     private Ticker ticker = new Ticker(15);
 
-    /**
-     * Are we rendering in wireframe mode?
-     */
     private boolean wireframe=false;
-    private int switchMode=0;
-    /**
-     * Flags for the keys
-     */
+
     private boolean left=false;
     private boolean right=false;
     private boolean forward=false;
     private boolean back=false;
-    private boolean fire=false;
-    private int fireCount=3;
     private final static int SWITCH_RENDERER=35;
+
+    private RailLine railLine1 = null;
 
 
     public Hello3dWorld() throws Exception
@@ -65,15 +61,12 @@ public class Hello3dWorld
         terr = new Terrain(world);
         terr.create();
 
-//        box = Primitives.getBox(13f, 2f);
-//        box.setTexture("box");
-//        box.setEnvmapped(Object3D.ENVMAP_ENABLED);
-//        box.build();
-//        world.addObject(box);
+        rail = new Rail(world);
+        rail.create();
 
         camera = world.getCamera();
-        camera.setPosition(50, -50, -5);
-        camera.lookAt(terr.getTransformedCenter());
+        camera.setPosition(5, 0f, -5);
+//        camera.lookAt(terr.getTransformedCenter());
 
         World.setDefaultThread(Thread.currentThread());
 
@@ -85,16 +78,17 @@ public class Hello3dWorld
         keyMapper=new KeyMapper();
         mouseMapper = new MouseMapper(buffer);
         mouseMapper.hide();
+
+        railLine1 = new RailLine(new SimpleVector(500f, 100f, 500f), new SimpleVector(-500f, 100f, -500f), world);
+        railLine1.create();
     }
 
     public void loop() throws Exception
     {
         long ticks = 0;
 
-        while (!org.lwjgl.opengl.Display.isCloseRequested())
+        while (!org.lwjgl.opengl.Display.isCloseRequested() && !isExit)
         {
-
-
             ticks = ticker.getTicks();
             if (ticks > 0)
             {
@@ -128,9 +122,9 @@ public class Hello3dWorld
         if (ticks == 0)
             return;
 
+        rail.rotate(0f, 0.1f, 0f);
 
         // Key controls
-
         SimpleVector ellipsoid = new SimpleVector(5, 5, 5);
 
         if (forward)
@@ -183,12 +177,12 @@ public class Hello3dWorld
 
     private void display()
     {
-        blitNumber((int) fpsCnt.getFps(), 5, 2);
-        blitNumber((int) world.getVisibilityList().getSize(), 5, 12);
+        showNumber(fpsCnt.getFps(), 5, 2);
+        showNumber(world.getVisibilityList().getSize(), 5, 12);
         buffer.displayGLOnly();
     }
 
-    private void blitNumber(int number, int x, int y)
+    private void showNumber(int number, int x, int y)
     {
         if (numbers!=null)
         {
@@ -217,45 +211,29 @@ public class Hello3dWorld
     private void keyAffected(KeyState state)
     {
         int code=state.getKeyCode();
-        boolean event=state.getState();
+        boolean event = state.getState();
 
-        switch (code) {
-            case (KeyEvent.VK_ESCAPE): {
-                exit=event;
+        switch (code)
+        {
+            case (KeyEvent.VK_ESCAPE):
+                isExit = event;
                 break;
-            }
-            case (KeyEvent.VK_LEFT): {
-                left=event;
+            case (KeyEvent.VK_LEFT):
+                left = event;
                 break;
-            }
-            case (KeyEvent.VK_RIGHT): {
-                right=event;
+            case (KeyEvent.VK_RIGHT):
+                right = event;
                 break;
-            }
-            case (KeyEvent.VK_UP): {
-                forward=event;
+            case (KeyEvent.VK_UP):
+                forward = event;
                 break;
-            }
-            case (KeyEvent.VK_SPACE): {
-                fire=event;
+            case (KeyEvent.VK_DOWN):
+                back = event;
                 break;
-            }
-            case (KeyEvent.VK_DOWN): {
-                back=event;
+            case (KeyEvent.VK_W):
+                if (event)
+                    wireframe =! wireframe;
                 break;
-            }
-            case (KeyEvent.VK_W): {
-                if (event) {
-                    wireframe=!wireframe;
-                }
-                break;
-            }
-            case (KeyEvent.VK_X): {
-                if (event) {
-                    switchMode=SWITCH_RENDERER;
-                }
-                break;
-            }
         }
     }
 }
