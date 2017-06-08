@@ -38,9 +38,14 @@ public class Hello3dWorld
     private boolean right=false;
     private boolean forward=false;
     private boolean back=false;
-    private final static int SWITCH_RENDERER=35;
+    private boolean up=false;
+    private boolean down=false;
+
 
     private RailLine railLine1 = null;
+    private RailLine railLine2 = null;
+    private RailLine railLine3 = null;
+    private RailLine railLine4 = null;
 
 
     public Hello3dWorld() throws Exception
@@ -79,8 +84,15 @@ public class Hello3dWorld
         mouseMapper = new MouseMapper(buffer);
         mouseMapper.hide();
 
-        railLine1 = new RailLine(new SimpleVector(500f, 100f, 500f), new SimpleVector(-500f, 100f, -500f), world);
+//        railLine1 = new RailLine(new SimpleVector(500f, 100f, 500f), new SimpleVector(-500f, 100f, -500f), world);
+        railLine1 = new RailLine(new SimpleVector(500f, 100f, 500f), new SimpleVector(300f, 100f, 300f), world);
         railLine1.create();
+        railLine2 = new RailLine(railLine1.getConnectorTwo(), new SimpleVector(0f, 100f, 0f), world);
+        railLine2.create();
+        railLine3 = new RailLine(railLine2.getConnectorTwo(), new SimpleVector(-200f, 100f, -200f), world);
+        railLine3.create();
+        railLine4 = new RailLine(railLine3.getConnectorTwo(), new SimpleVector(-500f, 100f, -500f), world);
+        railLine4.create();
     }
 
     public void loop() throws Exception
@@ -138,18 +150,14 @@ public class Hello3dWorld
 
         if (right)
             world.checkCameraCollisionEllipsoid(Camera.CAMERA_MOVERIGHT, ellipsoid, ticks, 5);
-/*
+
         if (up)
             world.checkCameraCollisionEllipsoid(Camera.CAMERA_MOVEUP, ellipsoid, ticks, 5);
-        }
 
-        if (down) {
-            world.checkCameraCollisionEllipsoid(Camera.CAMERA_MOVEDOWN,
-                    ellipsoid, ticks, 5);
-        }
-        */
+        if (down)
+            world.checkCameraCollisionEllipsoid(Camera.CAMERA_MOVEDOWN, ellipsoid, ticks, 5);
+
         // mouse rotation
-
         Matrix rot = world.getCamera().getBack();
         int dx = mouseMapper.getDeltaX();
         int dy = mouseMapper.getDeltaY();
@@ -218,19 +226,25 @@ public class Hello3dWorld
             case (KeyEvent.VK_ESCAPE):
                 isExit = event;
                 break;
-            case (KeyEvent.VK_LEFT):
+            case (KeyEvent.VK_A):
                 left = event;
                 break;
-            case (KeyEvent.VK_RIGHT):
+            case (KeyEvent.VK_D):
                 right = event;
                 break;
-            case (KeyEvent.VK_UP):
+            case (KeyEvent.VK_W):
                 forward = event;
                 break;
-            case (KeyEvent.VK_DOWN):
+            case (KeyEvent.VK_S):
                 back = event;
                 break;
-            case (KeyEvent.VK_W):
+            case (KeyEvent.VK_E):
+                up = event;
+                break;
+            case (KeyEvent.VK_F):
+                down = event;
+                break;
+            case (KeyEvent.VK_Q):
                 if (event)
                     wireframe =! wireframe;
                 break;
