@@ -5,7 +5,6 @@ package ru.dkuleshov.service;
  */
 public  class Ticker
 {
-
     private int rate;
     private long s2;
 
