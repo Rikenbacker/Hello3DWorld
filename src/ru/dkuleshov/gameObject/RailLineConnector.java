@@ -36,4 +36,24 @@ public class RailLineConnector
 
         link = _link;
     }
+
+    public RailLine.RealDirection getRealDirection(RailLine.Direction direction)
+    {
+        RailLine.RealDirection ret;
+
+        if (parent.getConnectorOne() == this)
+        {
+            ret = direction == RailLine.Direction.Outside ? RailLine.RealDirection.FromOneToTwo : RailLine.RealDirection.FromTwoToOne;
+        } else
+        {
+            ret = direction == RailLine.Direction.Outside ? RailLine.RealDirection.FromTwoToOne : RailLine.RealDirection.FromOneToTwo;
+        };
+
+        return ret;
+    }
+
+    public RailLine getParent()
+    {
+        return  parent;
+    }
 }

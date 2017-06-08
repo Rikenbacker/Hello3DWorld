@@ -13,11 +13,11 @@ import ru.dkuleshov.gameObject.*;
 public class Hello3dWorld
 {
     private Terrain terr = null;
-    private float xAngle = 0;
+
     private World world;
     private FrameBuffer buffer;
     private Object3D box;
-    private Camera camera=null;
+    private WorldCamera wcamera=null;
 
     private TextureManager texMan=null;
     private Texture numbers=null;
@@ -29,8 +29,6 @@ public class Hello3dWorld
     private int height=600;
     private boolean isExit = false;
     Rail rail = null;
-
-    private Ticker ticker = new Ticker(15);
 
     private boolean wireframe=false;
 
@@ -46,6 +44,7 @@ public class Hello3dWorld
     private RailLine railLine2 = null;
     private RailLine railLine3 = null;
     private RailLine railLine4 = null;
+    private Locomotive loco = null;
 
 
     public Hello3dWorld() throws Exception
@@ -63,15 +62,7 @@ public class Hello3dWorld
         texMan.addTexture("rocks", new Texture("textures" + dirSeparator + "rocks.jpg"));
         texMan.addTexture("grid", new Texture("textures" + dirSeparator + "grid.jpg"));
 
-        terr = new Terrain(world);
-        terr.create();
-
-        rail = new Rail(world);
-        rail.create();
-
-        camera = world.getCamera();
-        camera.setPosition(5, 0f, -5);
-//        camera.lookAt(terr.getTransformedCenter());
+        wcamera = new WorldCamera(world);
 
         World.setDefaultThread(Thread.currentThread());
 
@@ -84,7 +75,12 @@ public class Hello3dWorld
         mouseMapper = new MouseMapper(buffer);
         mouseMapper.hide();
 
-//        railLine1 = new RailLine(new SimpleVector(500f, 100f, 500f), new SimpleVector(-500f, 100f, -500f), world);
+        terr = new Terrain(world);
+        terr.create();
+
+        rail = new Rail(world);
+        rail.create();
+
         railLine1 = new RailLine(new SimpleVector(500f, 100f, 500f), new SimpleVector(300f, 100f, 300f), world);
         railLine1.create();
         railLine2 = new RailLine(railLine1.getConnectorTwo(), new SimpleVector(0f, 100f, 0f), world);
@@ -93,19 +89,23 @@ public class Hello3dWorld
         railLine3.create();
         railLine4 = new RailLine(railLine3.getConnectorTwo(), new SimpleVector(-500f, 100f, -500f), world);
         railLine4.create();
+
+        loco = new Locomotive(railLine1.getConnectorOne(), RailLine.Direction.Outside, world);
+        loco.create();
+        loco.setSpeed(9f);
     }
 
     public void loop() throws Exception
     {
-        long ticks = 0;
+
+        Ticker ticker = new Ticker(15);
 
         while (!org.lwjgl.opengl.Display.isCloseRequested() && !isExit)
         {
-            ticks = ticker.getTicks();
-            if (ticks > 0)
+            if (ticker.getTicks() > 0)
             {
                 poll();
-                move(ticks);
+                move(ticker);
             }
 
             buffer.clear(java.awt.Color.BLUE);
@@ -129,58 +129,37 @@ public class Hello3dWorld
         System.exit(0);
     }
 
-    private void move(long ticks)
+    private void move(Ticker ticker)
     {
-        if (ticks == 0)
+        if (ticker.getLastTicks() == 0)
             return;
 
         rail.rotate(0f, 0.1f, 0f);
+        loco.move(ticker.getLastSecundes());
 
         // Key controls
         SimpleVector ellipsoid = new SimpleVector(5, 5, 5);
 
         if (forward)
-            world.checkCameraCollisionEllipsoid(Camera.CAMERA_MOVEIN, ellipsoid, ticks, 5);
+            world.checkCameraCollisionEllipsoid(Camera.CAMERA_MOVEIN, ellipsoid, ticker.getLastTicks(), 5);
 
         if (back)
-            world.checkCameraCollisionEllipsoid(Camera.CAMERA_MOVEOUT, ellipsoid, ticks, 5);
+            world.checkCameraCollisionEllipsoid(Camera.CAMERA_MOVEOUT, ellipsoid, ticker.getLastTicks(), 5);
 
         if (left)
-            world.checkCameraCollisionEllipsoid(Camera.CAMERA_MOVELEFT, ellipsoid, ticks, 5);
+            world.checkCameraCollisionEllipsoid(Camera.CAMERA_MOVELEFT, ellipsoid, ticker.getLastTicks(), 5);
 
         if (right)
-            world.checkCameraCollisionEllipsoid(Camera.CAMERA_MOVERIGHT, ellipsoid, ticks, 5);
+            world.checkCameraCollisionEllipsoid(Camera.CAMERA_MOVERIGHT, ellipsoid, ticker.getLastTicks(), 5);
 
         if (up)
-            world.checkCameraCollisionEllipsoid(Camera.CAMERA_MOVEUP, ellipsoid, ticks, 5);
+            world.checkCameraCollisionEllipsoid(Camera.CAMERA_MOVEUP, ellipsoid, ticker.getLastTicks(), 5);
 
         if (down)
-            world.checkCameraCollisionEllipsoid(Camera.CAMERA_MOVEDOWN, ellipsoid, ticks, 5);
+            world.checkCameraCollisionEllipsoid(Camera.CAMERA_MOVEDOWN, ellipsoid, ticker.getLastTicks(), 5);
 
         // mouse rotation
-        Matrix rot = world.getCamera().getBack();
-        int dx = mouseMapper.getDeltaX();
-        int dy = mouseMapper.getDeltaY();
-
-        float ts = 0.2f * ticks;
-        float tsy = ts;
-
-        if (dx != 0)
-            ts = dx / 500f;
-
-        if (dy != 0)
-            tsy = dy / 500f;
-
-        if (dx != 0)
-            rot.rotateAxis(rot.getYAxis(), ts);
-
-        if ((dy > 0 && xAngle < Math.PI / 2) || (dy < 0 && xAngle > -Math.PI / 2))
-        {
-            rot.rotateX(tsy);
-            xAngle += tsy;
-        }
-
-        world.getCamera().setBack(world.getCamera().getBack().cloneMatrix());
+        wcamera.rotateMouse(mouseMapper, ticker.getLastTicks());
     }
 
     private void display()

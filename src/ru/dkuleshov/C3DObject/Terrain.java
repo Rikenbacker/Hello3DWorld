@@ -40,4 +40,30 @@ public class Terrain implements C3DObject
         else
             return null;
     }
+
+    @Override
+    public void rotate(float x, float y, float z)
+    {
+        if (mesh == null)
+            return;
+
+        mesh.rotateX(x);
+        mesh.rotateY(y);
+        mesh.rotateZ(z);
+    }
+
+    @Override
+    public void translate(float x, float y, float z)
+    {
+        if (mesh == null)
+            return;
+
+        mesh.translate(x, y, z);
+    }
+
+    @Override
+    public void translate(SimpleVector addPos)
+    {
+        mesh.translate(addPos);
+    }
 }

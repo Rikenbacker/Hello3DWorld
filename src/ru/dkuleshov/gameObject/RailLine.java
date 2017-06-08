@@ -18,6 +18,9 @@ public class RailLine
 
     private World world = null;
 
+    public enum Direction {Inside, Outside};
+    public enum RealDirection {FromOneToTwo, FromTwoToOne};
+
     public RailLine(SimpleVector _start, SimpleVector _end, World _world)
     {
         pointOne = _start;
@@ -72,9 +75,14 @@ public class RailLine
         {
             Rail rail = new Rail(world);
             rail.create();
-            rail.translateTo(now.x, now.y + 0.8f, now.z);
+            rail.translate(now.x, now.y + 0.8f, now.z);
             rail.rotate(0, rotateAngle, 0);
             now.add(direction);
         }
+    }
+
+    public SimpleVector getMoveVector(SimpleVector position, RealDirection direction, float meters)
+    {
+        return new SimpleVector(-1f * meters, 0 * meters, -1f * meters);
     }
 }

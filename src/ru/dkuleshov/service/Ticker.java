@@ -7,6 +7,8 @@ public  class Ticker
 {
     private int rate;
     private long s2;
+    private int last_ticks;
+    private long last_milisecundes;
 
     public static long getTime()
     {
@@ -22,12 +24,23 @@ public  class Ticker
     public int getTicks()
     {
         long i = Ticker.getTime();
-        if (i - s2 > rate)
+        last_milisecundes = i - s2;
+        last_ticks = 0;
+        if (last_milisecundes > rate)
         {
-            int ticks = (int) ((i - s2) / (long) rate);
-            s2 += (long) rate * ticks;
-            return ticks;
+            last_ticks = (int) ((i - s2) / (long) rate);
+            s2 += (long) rate * last_ticks;
         }
-        return 0;
+        return last_ticks;
+    }
+
+    public int getLastTicks()
+    {
+        return last_ticks;
+    }
+
+    public float getLastSecundes()
+    {
+        return (float)last_milisecundes / 1000f;
     }
 }

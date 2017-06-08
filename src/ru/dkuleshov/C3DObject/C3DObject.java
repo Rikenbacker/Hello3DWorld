@@ -10,4 +10,8 @@ public interface C3DObject
     void create();
 
     SimpleVector getTransformedCenter();
+
+    void rotate(float x, float y, float z);
+    void translate(float x, float y, float z);
+    void translate(SimpleVector addPos);
 }

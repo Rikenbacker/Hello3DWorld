@@ -2,7 +2,6 @@ package ru.dkuleshov.C3DObject;
 
 import com.threed.jpct.Object3D;
 import com.threed.jpct.SimpleVector;
-import com.threed.jpct.Primitives;
 import com.threed.jpct.World;
 
 import java.util.ArrayList;
@@ -92,6 +91,7 @@ public class Rail implements C3DObject
         return rail.getTransformedCenter();
     }
 
+    @Override
     public void rotate(float x, float y, float z)
     {
         if (rail == null)
@@ -102,8 +102,15 @@ public class Rail implements C3DObject
         rail.rotateZ(z);
     }
 
-    public void translateTo(float x, float y, float z)
+    @Override
+    public void translate(float x, float y, float z)
     {
         rail.translate(x, y, z);
+    }
+
+    @Override
+    public void translate(SimpleVector addPos)
+    {
+        rail.translate(addPos);
     }
 }
