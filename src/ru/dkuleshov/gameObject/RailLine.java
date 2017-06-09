@@ -21,6 +21,11 @@ public class RailLine
     public enum Direction {Inside, Outside};
     public enum RealDirection {FromAToB, FromBToA};
 
+    public RailLine(SimpleVector _start, SimpleVector _startDir, SimpleVector _end, SimpleVector _endDir World _world)
+    {
+
+    }
+
     public RailLine(SimpleVector _start, SimpleVector _end, World _world)
     {
         pointOne = _start;
