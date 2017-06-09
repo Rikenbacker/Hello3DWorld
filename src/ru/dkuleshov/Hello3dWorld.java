@@ -7,10 +7,12 @@ import java.awt.*;
 import java.awt.event.*;
 
 import ru.dkuleshov.C3DObject.*;
+import ru.dkuleshov.Events.ChangeRailLineEvent;
+import ru.dkuleshov.Events.IChangeRailLineListener;
 import ru.dkuleshov.service.*;
 import ru.dkuleshov.gameObject.*;
 
-public class Hello3dWorld
+public class Hello3dWorld implements IChangeRailLineListener
 {
     private Terrain terr = null;
 
@@ -92,7 +94,11 @@ public class Hello3dWorld
 
         loco = new Locomotive(railLine1.getConnectorOne(), RailLine.Direction.Outside, world);
         loco.create();
-        loco.setSpeed(9f);
+        loco.setMaxSpeed(30f);
+        loco.setAcceleration(0.5f, Locomotive.AccelerationType.MoveForward);
+        loco.addChangeRailLineListener(this);
+
+        wcamera.follow(loco.getC3DObject());
     }
 
     public void loop() throws Exception
@@ -228,5 +234,16 @@ public class Hello3dWorld
                     wireframe =! wireframe;
                 break;
         }
+    }
+
+    public void RailLineChanched(ChangeRailLineEvent e)
+    {
+        if (loco == null)
+            return;
+
+        if (loco.getRailLine() == railLine2)
+            loco.setAcceleration(10f, Locomotive.AccelerationType.MoveBackward);
+        if (loco.getRailLine() == railLine1)
+            loco.setAcceleration(1f, Locomotive.AccelerationType.Breaking);
     }
 }

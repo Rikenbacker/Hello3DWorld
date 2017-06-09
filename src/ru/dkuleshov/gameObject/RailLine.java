@@ -19,7 +19,7 @@ public class RailLine
     private World world = null;
 
     public enum Direction {Inside, Outside};
-    public enum RealDirection {FromOneToTwo, FromTwoToOne};
+    public enum RealDirection {FromAToB, FromBToA};
 
     public RailLine(SimpleVector _start, SimpleVector _end, World _world)
     {
@@ -84,5 +84,46 @@ public class RailLine
     public SimpleVector getMoveVector(SimpleVector position, RealDirection direction, float meters)
     {
         return new SimpleVector(-1f * meters, 0 * meters, -1f * meters);
+    }
+
+    /**
+     * Возвращает длину линии
+     */
+    public float getLineLength()
+    {
+        return pointOne.distance(pointTwo);
+    }
+
+    /**
+     * Возвращает координаты точки на линии в глобальном измерении
+     *
+     * @param position точка на линни
+     * @return Координаты точки
+     */
+    public SimpleVector getPositionVector(float positon)
+    {
+        SimpleVector direction = pointTwo.calcSub(pointOne);
+        direction.scalarMul(positon / pointOne.distance(pointTwo));
+        return pointOne.calcAdd(direction);
+    }
+
+    /**
+     * Возвращает коннектор подключенную к коннктору A
+     *
+     * @return Коннектор
+     */
+    public RailLineConnector getLinkFromConnectorA()
+    {
+        return connectorOne.getConnecteвLink();
+    }
+
+    /**
+     * Возвращает коннектор подключенную к коннктору B
+     *
+     * @return Коннектор
+     */
+    public RailLineConnector getLinkFromConnectorB()
+    {
+        return connectorTwo.getConnecteвLink();
     }
 }

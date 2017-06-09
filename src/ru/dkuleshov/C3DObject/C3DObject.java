@@ -14,4 +14,6 @@ public interface C3DObject
     void rotate(float x, float y, float z);
     void translate(float x, float y, float z);
     void translate(SimpleVector addPos);
+    void setPosition(SimpleVector newPos);
+    SimpleVector getTranslation();
 }

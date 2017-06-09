@@ -113,4 +113,17 @@ public class Rail implements C3DObject
     {
         rail.translate(addPos);
     }
+
+    @Override
+    public SimpleVector getTranslation()
+    {
+        return rail.getTranslation();
+    }
+
+    @Override
+    public void setPosition(SimpleVector newPos)
+    {
+        rail.clearTranslation();
+        translate(newPos);
+    }
 }

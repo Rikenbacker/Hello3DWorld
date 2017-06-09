@@ -66,4 +66,17 @@ public class Terrain implements C3DObject
     {
         mesh.translate(addPos);
     }
+
+    @Override
+    public SimpleVector getTranslation()
+    {
+        return mesh.getTranslation();
+    }
+
+    @Override
+    public void setPosition(SimpleVector newPos)
+    {
+        mesh.clearTranslation();
+        translate(newPos);
+    }
 }

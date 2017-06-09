@@ -29,6 +29,17 @@ public class RailLineConnector
         return point;
     }
 
+    /**
+     * Возвращает своё положение на линии пути
+     *
+     * @param _direction Направление входа в соединение
+     * @return Положение объекта на пути
+     */
+    public RailPosition getPosition(RailLine.Direction _direction)
+    {
+        return new RailPosition(parent, parent.getConnectorOne() == this ? 0f : parent.getLineLength(), getRealDirection(_direction));
+    }
+
     public void setLink(RailLineConnector _link) throws Exception
     {
         if (_link.getPoint() != point)
@@ -43,10 +54,10 @@ public class RailLineConnector
 
         if (parent.getConnectorOne() == this)
         {
-            ret = direction == RailLine.Direction.Outside ? RailLine.RealDirection.FromOneToTwo : RailLine.RealDirection.FromTwoToOne;
+            ret = direction == RailLine.Direction.Outside ? RailLine.RealDirection.FromAToB : RailLine.RealDirection.FromBToA;
         } else
         {
-            ret = direction == RailLine.Direction.Outside ? RailLine.RealDirection.FromTwoToOne : RailLine.RealDirection.FromOneToTwo;
+            ret = direction == RailLine.Direction.Outside ? RailLine.RealDirection.FromBToA : RailLine.RealDirection.FromAToB;
         };
 
         return ret;
@@ -55,5 +66,15 @@ public class RailLineConnector
     public RailLine getParent()
     {
         return  parent;
+    }
+
+    /**
+     * Возвращает подключенный коннектор от другой линии
+     *
+     * @return Положение объекта на пути
+     */
+    public RailLineConnector getConnecteвLink()
+    {
+        return link;
     }
 }
