@@ -4,6 +4,7 @@ import com.threed.jpct.SimpleVector;
 import com.threed.jpct.World;
 
 import ru.dkuleshov.C3DObject.*;
+import ru.dkuleshov.service.*;
 
 /**
  * Created by dkuleshov3 on 08.06.2017.
@@ -21,9 +22,24 @@ public class RailLine
     public enum Direction {Inside, Outside};
     public enum RealDirection {FromAToB, FromBToA};
 
-    public RailLine(SimpleVector _start, SimpleVector _startDir, SimpleVector _end, SimpleVector _endDir World _world)
+    public RailLine(SimpleVector _start, SimpleVector _startDir, SimpleVector _end, SimpleVector _endDir, World _world)
     {
+        /*
+        1. Подсчитать длину кривой безье
+        2. Разбить на необходимое количество кусков в зависимости от длины
+        3. Построить из кусков.
 
+         */
+        SimpleMath.Point2D f1 = new SimpleMath.Point2D(_start);
+        SimpleMath.Point2D f2 = new SimpleMath.Point2D(510, 510);
+        SimpleMath.Point2D e1 = new SimpleMath.Point2D(_end);
+        SimpleMath.Point2D e2 = new SimpleMath.Point2D(510, 240);
+        SimpleMath.Point2D zz = SimpleMath.calcIntersection(f1, f2, e1, e2);
+        pointOne = _start;
+        pointTwo = _end;
+        connectorOne = new RailLineConnector(this, _start);
+        connectorTwo = new RailLineConnector(this, _end);
+        world = _world;
     }
 
     public RailLine(SimpleVector _start, SimpleVector _end, World _world)

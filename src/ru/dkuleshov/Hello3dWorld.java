@@ -82,17 +82,21 @@ public class Hello3dWorld implements IChangeRailLineListener
 
         rail = new Rail(world);
         rail.create();
-
+/*
         railLine1 = new RailLine(new SimpleVector(500f, 100f, 500f), new SimpleVector(300f, 100f, 300f), world);
         railLine1.create();
         railLine2 = new RailLine(railLine1.getConnectorTwo(), new SimpleVector(0f, 100f, 0f), world);
         railLine2.create();
-        railLine3 = new RailLine(railLine2.getConnectorTwo(), new SimpleVector(-200f, 100f, -200f), world);
+        */
+        railLine1 = new RailLine(new SimpleVector(500f, 100f, 500f), new SimpleVector(1f, 0f, 1f)
+                , new SimpleVector(500f, 100f, 250f), new SimpleVector(1f, 0f, 1f), world);
+        railLine1.create();
+        railLine3 = new RailLine(new SimpleVector(0f, 100f, 0f)/*railLine2.getConnectorTwo()*/, new SimpleVector(-200f, 100f, -200f), world);
         railLine3.create();
         railLine4 = new RailLine(railLine3.getConnectorTwo(), new SimpleVector(-500f, 100f, -500f), world);
         railLine4.create();
 
-        loco = new Locomotive(railLine1.getConnectorOne(), RailLine.Direction.Outside, world);
+        loco = new Locomotive(railLine3.getConnectorOne(), RailLine.Direction.Outside, world);
         loco.create();
         loco.setMaxSpeed(30f);
         loco.setAcceleration(0.5f, Locomotive.AccelerationType.MoveForward);
