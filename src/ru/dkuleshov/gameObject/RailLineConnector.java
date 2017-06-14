@@ -9,15 +9,15 @@ public class RailLineConnector
 {
     private Ray ray = null;
     private RailLineConnector link = null;
-    private RailLine parent = null;
+    private IRailroad parent = null;
 
-    public RailLineConnector(RailLine _parent, Ray _ray)
+    public RailLineConnector(IRailroad _parent, Ray _ray)
     {
         parent = _parent;
         ray = _ray;
     }
 
-    public RailLineConnector(RailLine _parent, RailLineConnector _link)
+    public RailLineConnector(IRailroad _parent, RailLineConnector _link)
     {
         parent = _parent;
         link = _link;
@@ -68,9 +68,9 @@ public class RailLineConnector
         return ret;
     }
 
-    public RailLine getParent()
+    public IRailroad getParent()
     {
-        return  parent;
+        return parent;
     }
 
     /**

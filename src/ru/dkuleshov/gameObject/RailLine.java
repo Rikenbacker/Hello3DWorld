@@ -9,7 +9,7 @@ import ru.dkuleshov.service.*;
 /**
  * Created by dkuleshov3 on 08.06.2017.
  */
-public class RailLine
+public class RailLine implements IRailroad
 {
     /** Начальное положение пути*/
     private Ray rayA = null;
@@ -27,8 +27,6 @@ public class RailLine
 
     private World world = null;
 
-    public enum Direction {Inside, Outside}
-    public enum RealDirection {FromAToB, FromBToA}
     private enum LineType {Line, BezierCurve}
 
     public RailLine(Ray _start, Ray _end, World _world) throws Exception
@@ -122,11 +120,13 @@ public class RailLine
 
     }
 
+    @Override
     public RailLineConnector getConnectorA()
     {
         return connectorA;
     }
 
+    @Override
     public RailLineConnector getConnectorB()
     {
         return connectorB;
@@ -163,14 +163,10 @@ public class RailLine
         }
     }
 
-    public Point3D getMoveVector(Point3D position, RealDirection direction, float meters)
-    {
-        return new Point3D(-1f * meters, 0 * meters, -1f * meters);
-    }
-
     /**
      * Возвращает длину линии
      */
+    @Override
     public float getLineLength()
     {
         return length;
@@ -182,6 +178,7 @@ public class RailLine
      * @param position точка на линни
      * @return Координаты точки
      */
+    @Override
     public Point3D getPositionVector(float position)
     {
         if (type == LineType.Line)
@@ -197,25 +194,5 @@ public class RailLine
         }
 
         return null;
-    }
-
-    /**
-     * Возвращает коннектор подключенную к коннктору A
-     *
-     * @return Коннектор
-     */
-    public RailLineConnector getLinkFromConnectorA()
-    {
-        return connectorA.getConnecteвLink();
-    }
-
-    /**
-     * Возвращает коннектор подключенную к коннктору B
-     *
-     * @return Коннектор
-     */
-    public RailLineConnector getLinkFromConnectorB()
-    {
-        return connectorB.getConnecteвLink();
     }
 }

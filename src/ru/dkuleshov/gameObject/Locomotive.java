@@ -47,11 +47,16 @@ public class Locomotive implements IChangeRailLineSender
         speed = _speed;
     }
 
+    public Point3D getPosition()
+    {
+        return position.getPositionVector();
+    }
+
     public void move(float secundes)
     {
         recalcSpeed(secundes);
 
-        RailLine tmpLine = position.getLine();
+        IRailroad tmpLine = position.getLine();
 
         position.move(speed * secundes);
         body.setPosition(position.getPositionVector().convertToSimpleVector());
@@ -121,7 +126,7 @@ public class Locomotive implements IChangeRailLineSender
         }
     }
 
-    public RailLine getRailLine()
+    public IRailroad getRailLine()
     {
         return position.getLine();
     }

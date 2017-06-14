@@ -8,11 +8,11 @@ import ru.dkuleshov.service.Point3D;
  */
 public class RailPosition
 {
-    private RailLine line = null;
+    private IRailroad line = null;
     private float position = 0;
-    private RailLine.RealDirection direction = null;
+    private IRailroad.RealDirection direction = null;
 
-    public RailPosition(RailLine _line, float _position, RailLine.RealDirection _direction)
+    public RailPosition(IRailroad _line, float _position, IRailroad.RealDirection _direction)
     {
         line = _line;
         position = _position;
@@ -45,10 +45,10 @@ public class RailPosition
             RailLineConnector conn = null;
 
             if (newPosition < 0)
-                conn = line.getLinkFromConnectorA();
+                conn = line.getConnectorA().getConnecteвLink();
 
             if (newPosition > lineLength)
-                conn = line.getLinkFromConnectorB();
+                conn = line.getConnectorB().getConnecteвLink();
 
             if (conn == null)
             {
@@ -84,7 +84,7 @@ public class RailPosition
         position = newPosition;
     }
 
-    public RailLine getLine()
+    public IRailroad getLine()
     {
         return line;
     }

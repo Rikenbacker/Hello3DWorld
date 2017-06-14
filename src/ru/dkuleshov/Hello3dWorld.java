@@ -45,6 +45,7 @@ public class Hello3dWorld implements IChangeRailLineListener
     private RailLine railLine2 = null;
     private RailLine railLine3 = null;
     private RailLine railLine4 = null;
+    private RailSwitch switch1 = null;
     private Locomotive loco = null;
 
 
@@ -87,10 +88,16 @@ public class Hello3dWorld implements IChangeRailLineListener
         railLine2 = new RailLine(railLine1.getConnectorTwo(), new SimpleVector(0f, 100f, 0f), world);
         railLine2.create();
 */
-        railLine1 = new RailLine(new Ray(500f, 100f, 500f, 1f, 0f, 1f)
-                , new Ray(250f, 100f, 500f, -1f, 0f, 1f), world);
+        railLine1 = new RailLine(new Point3D(500f, 100f, 500f), new Point3D(450f, 100f, 450f), world);
         railLine1.create();
-        railLine2 = new RailLine(railLine1.getConnectorB(), new Ray(0f, 100f, 500f, 1f, 0f, 1f), world);
+
+        switch1 = new RailSwitch(railLine1.getConnectorB(), new Ray(350f, 100f, 400f, -1f, 0f, -0f), world);
+        switch1.addLine(railLine1.getConnectorB(), new Point3D(400f, 100f, 400f), world);
+
+        RailLine railLine0 = new RailLine(switch1.getConnectorB(), new Ray(250f, 100f, 500f, -1f, 0f, 1.8f), world);
+        railLine0.create();
+
+        railLine2 = new RailLine(railLine0.getConnectorB(), new Ray(0f, 100f, 500f, 1f, 0f, 1f), world);
         railLine2.create();
 
         railLine3 = new RailLine(new Point3D(0f, 100f, 0f), new Point3D(-200f, 100f, -200f), world);
@@ -105,9 +112,14 @@ public class Hello3dWorld implements IChangeRailLineListener
         railLine4 = new RailLine(railLine3.getConnectorB(), new Point3D(-500f, 100f, -500f), world);
         railLine4.create();
 
+        railLine0 = new RailLine(switch1.getLine(1).getConnectorB(), new Point3D(-100f, 100f, -100f), world);
+        railLine0.create();
+
+        switch1.switchLine(1);
+
         loco = new Locomotive(railLine1.getConnectorA(), RailLine.Direction.Outside, world);
         loco.create();
-        loco.setSpeed(30f);
+        //loco.setSpeed(30f);
         loco.setMaxSpeed(30f);
         loco.setAcceleration(0.5f, Locomotive.AccelerationType.MoveForward);
         loco.addChangeRailLineListener(this);
@@ -186,6 +198,8 @@ public class Hello3dWorld implements IChangeRailLineListener
     {
         showNumber(fpsCnt.getFps(), 5, 2);
         showNumber(world.getVisibilityList().getSize(), 5, 12);
+        showNumber((int)loco.getPosition().x, 5, 22);
+        showNumber((int)loco.getPosition().z, 25, 22);
         buffer.displayGLOnly();
     }
 
