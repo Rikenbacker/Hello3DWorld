@@ -6,6 +6,7 @@ import ru.dkuleshov.C3DObject.*;
 import ru.dkuleshov.Events.ChangeRailLineEvent;
 import ru.dkuleshov.Events.IChangeRailLineListener;
 import ru.dkuleshov.Events.IChangeRailLineSender;
+import ru.dkuleshov.service.Point3D;
 
 import java.util.ArrayList;
 
@@ -37,7 +38,7 @@ public class Locomotive implements IChangeRailLineSender
     {
         body = new  Rail(world);
         body.create();
-        SimpleVector pos = position.getPositionVector();
+        Point3D pos = position.getPositionVector();
         body.translate(pos.x, pos.y - 0.5f, pos.z);
     }
 
@@ -53,7 +54,7 @@ public class Locomotive implements IChangeRailLineSender
         RailLine tmpLine = position.getLine();
 
         position.move(speed * secundes);
-        body.setPosition(position.getPositionVector());
+        body.setPosition(position.getPositionVector().convertToSimpleVector());
 
         if (tmpLine != position.getLine())
             doChangeRailLineEvent("ХУЙ");

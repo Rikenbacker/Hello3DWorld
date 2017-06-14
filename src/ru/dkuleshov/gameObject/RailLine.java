@@ -11,100 +11,161 @@ import ru.dkuleshov.service.*;
  */
 public class RailLine
 {
-    SimpleVector pointOne = null;
-    SimpleVector pointTwo = null;
+    /** Начальное положение пути*/
+    private Ray rayA = null;
+    /** Конечное положение пути*/
+    private Ray rayB = null;
+    /** Тип построения пути*/
+    private LineType type = LineType.Line;
 
-    RailLineConnector connectorOne = null;
-    RailLineConnector connectorTwo = null;
+    Point3D additionalPointOne = null;
+
+    RailLineConnector connectorA = null;
+    RailLineConnector connectorB = null;
+
+    private float length;
 
     private World world = null;
 
-    public enum Direction {Inside, Outside};
-    public enum RealDirection {FromAToB, FromBToA};
+    public enum Direction {Inside, Outside}
+    public enum RealDirection {FromAToB, FromBToA}
+    private enum LineType {Line, BezierCurve}
 
-    public RailLine(SimpleVector _start, SimpleVector _startDir, SimpleVector _end, SimpleVector _endDir, World _world)
+    public RailLine(Ray _start, Ray _end, World _world) throws Exception
     {
-        /*
-        1. Подсчитать длину кривой безье
-        2. Разбить на необходимое количество кусков в зависимости от длины
-        3. Построить из кусков.
-
-         */
-        SimpleMath.Point2D f1 = new SimpleMath.Point2D(_start);
-        SimpleMath.Point2D f2 = new SimpleMath.Point2D(510, 510);
-        SimpleMath.Point2D e1 = new SimpleMath.Point2D(_end);
-        SimpleMath.Point2D e2 = new SimpleMath.Point2D(510, 240);
-        SimpleMath.Point2D zz = SimpleMath.calcIntersection(f1, f2, e1, e2);
-        pointOne = _start;
-        pointTwo = _end;
-        connectorOne = new RailLineConnector(this, _start);
-        connectorTwo = new RailLineConnector(this, _end);
+        rayA = _start;
+        rayB = _end;
+        connectorA = new RailLineConnector(this, rayA);
+        connectorB = new RailLineConnector(this, rayB);
         world = _world;
+
+        calcType();
     }
 
-    public RailLine(SimpleVector _start, SimpleVector _end, World _world)
+    public RailLine(RailLineConnector _start, Ray _end, World _world) throws Exception
     {
-        pointOne = _start;
-        pointTwo = _end;
-        connectorOne = new RailLineConnector(this, _start);
-        connectorTwo = new RailLineConnector(this, _end);
+        rayA = _start.getRay();
+        rayB = _end;
+        connectorA = new RailLineConnector(this, _start);
+        _start.setLink(connectorA);
+        connectorB = new RailLineConnector(this, rayB);
         world = _world;
+
+        calcType();
     }
 
-    public RailLine(RailLineConnector _start, SimpleVector _end, World _world) throws Exception
+    public RailLine(Point3D _start, Point3D _end, World _world) throws Exception
     {
-        pointOne = _start.getPoint();
-        pointTwo = _end;
-        connectorOne = new RailLineConnector(this, _start);
-        _start.setLink(connectorOne);
-        connectorTwo = new RailLineConnector(this, _end);
+        rayA = new Ray(_start, _start.calcSub(_end));
+        rayB = new Ray(_end, _end.calcSub(_start));
+        connectorA = new RailLineConnector(this, rayA);
+        connectorB = new RailLineConnector(this, rayB);
         world = _world;
+
+        calcType();
+    }
+
+    public RailLine(RailLineConnector _start, Point3D _end, World _world) throws Exception
+    {
+        rayA = _start.getRay();
+        rayB = new Ray(_end, _end.calcSub(rayA.getPoint()));
+        connectorA = new RailLineConnector(this, _start);
+        _start.setLink(connectorA);
+        connectorB = new RailLineConnector(this, rayB);
+        world = _world;
+
+        calcType();
     }
 
     public RailLine(RailLineConnector _start, RailLineConnector _end, World _world) throws Exception
     {
-        pointOne = _start.getPoint();
-        pointTwo = _end.getPoint();
-        connectorOne = new RailLineConnector(this, _start);
-        _start.setLink(connectorOne);
-        connectorTwo = new RailLineConnector(this, _end);
-        _end.setLink(connectorTwo);
+        rayA = _start.getRay();
+        rayB = _end.getRay();
+        connectorA = new RailLineConnector(this, _start);
+        _start.setLink(connectorA);
+        connectorB = new RailLineConnector(this, _end);
+        _end.setLink(connectorB);
         world = _world;
+
+        calcType();
     }
 
-    public RailLineConnector getConnectorOne()
+    private void calcType() throws Exception
     {
-        return connectorOne;
+        if (rayA.isMatch(rayB))
+        {
+            type = LineType.Line;
+            length = rayA.getPoint().distance(rayB.getPoint());
+        } else
+            prepareBezier(rayA, rayB);
     }
 
-    public RailLineConnector getConnectorTwo()
+    private void prepareBezier(Ray start, Ray end) throws Exception
     {
-        return connectorTwo;
+        /*
+        1. Подсчитать длину кривой безье по трем точкам (по двум входным векторам)
+        2. Если построить по двум векторам не выходит, разбить на необходимое количество кусков (Или ещё лучше увеличить количество точек кривой безье)
+        3. Построить из кусков.
+        */
+        Point3D tmpPoint = start.calcIntersection(end);
+        if (tmpPoint == null)
+            throw new Exception("Lines not intersected");
+
+        type = LineType.BezierCurve;
+
+        Point3D[] tmpArr = {start.getPoint(), tmpPoint, end.getPoint()};
+        length = SimpleMath.calc3DotBezierLength(tmpArr, 1000);
+        additionalPointOne = tmpPoint;
+
+        // 2.
+        // Для теста один кусок
+
+    }
+
+    public RailLineConnector getConnectorA()
+    {
+        return connectorA;
+    }
+
+    public RailLineConnector getConnectorB()
+    {
+        return connectorB;
     }
 
     public void create()
     {
-        float distance = pointOne.distance(pointTwo);
-        SimpleVector direction = new SimpleVector((pointTwo.x - pointOne.x)/distance, (pointTwo.y - pointOne.y)/distance, (pointTwo.z - pointOne.z)/distance);
-
-        SimpleVector tmpSV = new SimpleVector(0f, 0f, 0f);
-        tmpSV.sub(direction);
-        float rotateAngle = new SimpleVector(1f, 0f, 0f).calcAngle(tmpSV);
-
-        SimpleVector now = new SimpleVector(pointOne);
-        for (float f = 0; f < distance; f++)
+        if (type == LineType.Line)
         {
-            Rail rail = new Rail(world);
-            rail.create();
-            rail.translate(now.x, now.y + 0.8f, now.z);
-            rail.rotate(0, rotateAngle, 0);
-            now.add(direction);
+            Point3D direction = rayB.getPoint().calcSub(rayA.getPoint()).calcDiv(length);
+            Point3D tmpSV = new Point3D(0f, 0f, 0f).calcSub(direction);
+            float rotateAngle = new Point3D(1f, 0f, 0f).calcAngle(tmpSV);
+
+            Point3D now = rayA.getPoint();
+            for (float f = 0; f < length; f++)
+            {
+                Rail rail = new Rail(world);
+                rail.create();
+                rail.translate(now.x, now.y + 0.8f, now.z);
+                rail.rotate(0, rotateAngle, 0);
+                now.add(direction);
+            }
+        } else if (type == LineType.BezierCurve)
+        {
+            Point3D[] tmpArr = {rayA.getPoint(), additionalPointOne, rayB.getPoint()};
+            for (float f = 0; f < length; f++)
+            {
+                Point3D tmpNow = SimpleMath.calc3DotBezierPoint(tmpArr, f / length);
+                SimpleVector now = tmpNow.convertToSimpleVector();
+                Rail rail = new Rail(world);
+                rail.create();
+                rail.translate(now.x, now.y + 0.8f, now.z);
+            }
         }
     }
 
-    public SimpleVector getMoveVector(SimpleVector position, RealDirection direction, float meters)
+    public Point3D getMoveVector(Point3D position, RealDirection direction, float meters)
     {
-        return new SimpleVector(-1f * meters, 0 * meters, -1f * meters);
+        return new Point3D(-1f * meters, 0 * meters, -1f * meters);
     }
 
     /**
@@ -112,7 +173,7 @@ public class RailLine
      */
     public float getLineLength()
     {
-        return pointOne.distance(pointTwo);
+        return length;
     }
 
     /**
@@ -121,11 +182,21 @@ public class RailLine
      * @param position точка на линни
      * @return Координаты точки
      */
-    public SimpleVector getPositionVector(float positon)
+    public Point3D getPositionVector(float position)
     {
-        SimpleVector direction = pointTwo.calcSub(pointOne);
-        direction.scalarMul(positon / pointOne.distance(pointTwo));
-        return pointOne.calcAdd(direction);
+        if (type == LineType.Line)
+        {
+            Point3D direction = rayB.getPoint().calcSub(rayA.getPoint());
+            direction.mult(position / rayA.getPoint().distance(rayB.getPoint()));
+            return rayA.getPoint().calcAdd(direction);
+        } else if (type == LineType.BezierCurve)
+        {
+            Point3D[] tmpArr = {rayA.getPoint(), additionalPointOne, rayB.getPoint()};
+            Point3D tmpNow = SimpleMath.calc3DotBezierPoint(tmpArr, position / length);
+            return tmpNow;
+        }
+
+        return null;
     }
 
     /**
@@ -135,7 +206,7 @@ public class RailLine
      */
     public RailLineConnector getLinkFromConnectorA()
     {
-        return connectorOne.getConnecteвLink();
+        return connectorA.getConnecteвLink();
     }
 
     /**
@@ -145,6 +216,6 @@ public class RailLine
      */
     public RailLineConnector getLinkFromConnectorB()
     {
-        return connectorTwo.getConnecteвLink();
+        return connectorB.getConnecteвLink();
     }
 }

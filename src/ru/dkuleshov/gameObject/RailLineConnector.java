@@ -1,32 +1,37 @@
 package ru.dkuleshov.gameObject;
 
-import com.threed.jpct.SimpleVector;
+import ru.dkuleshov.service.*;
 
 /**
  * Created by dkuleshov3 on 08.06.2017.
  */
 public class RailLineConnector
 {
-    private SimpleVector point = null;
+    private Ray ray = null;
     private RailLineConnector link = null;
     private RailLine parent = null;
 
-    public RailLineConnector(RailLine _parent, SimpleVector _point)
+    public RailLineConnector(RailLine _parent, Ray _ray)
     {
         parent = _parent;
-        point = _point;
+        ray = _ray;
     }
 
     public RailLineConnector(RailLine _parent, RailLineConnector _link)
     {
         parent = _parent;
         link = _link;
-        point = _link.getPoint();
+        ray = _link.getRay();
     }
 
-    public SimpleVector getPoint()
+    public Point3D getPoint()
     {
-        return point;
+        return ray.getPoint();
+    }
+
+    public Ray getRay()
+    {
+        return new Ray(ray);
     }
 
     /**
@@ -37,12 +42,12 @@ public class RailLineConnector
      */
     public RailPosition getPosition(RailLine.Direction _direction)
     {
-        return new RailPosition(parent, parent.getConnectorOne() == this ? 0f : parent.getLineLength(), getRealDirection(_direction));
+        return new RailPosition(parent, parent.getConnectorA() == this ? 0f : parent.getLineLength(), getRealDirection(_direction));
     }
 
     public void setLink(RailLineConnector _link) throws Exception
     {
-        if (_link.getPoint() != point)
+        if (!_link.getPoint().equals(ray.getPoint()))
             throw new Exception("Connectors placed in different places.");
 
         link = _link;
@@ -52,7 +57,7 @@ public class RailLineConnector
     {
         RailLine.RealDirection ret;
 
-        if (parent.getConnectorOne() == this)
+        if (parent.getConnectorA() == this)
         {
             ret = direction == RailLine.Direction.Outside ? RailLine.RealDirection.FromAToB : RailLine.RealDirection.FromBToA;
         } else
@@ -76,5 +81,10 @@ public class RailLineConnector
     public RailLineConnector getConnecteвLink()
     {
         return link;
+    }
+
+    public Point3D getDirection()
+    {
+        return ray.getDirection();
     }
 }

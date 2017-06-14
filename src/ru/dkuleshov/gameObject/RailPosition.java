@@ -1,6 +1,7 @@
 package ru.dkuleshov.gameObject;
 
 import com.threed.jpct.SimpleVector;
+import ru.dkuleshov.service.Point3D;
 
 /**
  * Created by dkuleshov3 on 09.06.2017.
@@ -18,7 +19,7 @@ public class RailPosition
         direction = _direction;
     }
 
-    public SimpleVector getPositionVector()
+    public Point3D getPositionVector()
     {
         return line.getPositionVector(position);
     }
