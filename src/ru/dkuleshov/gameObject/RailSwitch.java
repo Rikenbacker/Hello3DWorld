@@ -114,9 +114,15 @@ public class RailSwitch implements IRailroad
         return lines.get(i);
     }
 
-    public void switchLine(int i) throws Exception
+    public void switchLine(int i)
     {
-        activeLine = lines.get(i);
-        reconnectActiveLine();
+        try
+        {
+            activeLine = lines.get(i);
+            reconnectActiveLine();
+        } catch (Exception ex)
+        {
+
+        }
     }
 }

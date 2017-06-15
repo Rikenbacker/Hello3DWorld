@@ -46,6 +46,7 @@ public class Hello3dWorld implements IChangeRailLineListener
     private RailLine railLine3 = null;
     private RailLine railLine4 = null;
     private RailSwitch switch1 = null;
+    private RailSwitch switch2 = null;
     private Locomotive loco = null;
 
 
@@ -106,20 +107,26 @@ public class Hello3dWorld implements IChangeRailLineListener
         railLine2 = new RailLine(railLine2.getConnectorB(), new Ray(0f, 100f, 250f, 1f, 0f, -1f), world);
         railLine2.create();
 
-        railLine2 = new RailLine(railLine2.getConnectorB(), railLine3.getConnectorA(), world);
+        railLine2 = new RailLine(railLine2.getConnectorB(), new Ray(44f, 100f, 50f, 0.5f, 0f, 1f), world);
         railLine2.create();
 
+        switch2 = new RailSwitch(railLine2.getConnectorB(), railLine3.getConnectorA(), world);
+  /*
+        railLine2 = new RailLine(railLine2.getConnectorB(), railLine3.getConnectorA(), world);
+        railLine2.create();
+*/
         railLine4 = new RailLine(railLine3.getConnectorB(), new Point3D(-500f, 100f, -500f), world);
         railLine4.create();
 
-        railLine0 = new RailLine(switch1.getLine(1).getConnectorB(), new Point3D(-100f, 100f, -100f), world);
+        railLine0 = new RailLine(switch1.getLine(1).getConnectorB(), new Point3D(50f, 100f, 50f), world);
         railLine0.create();
 
-        switch1.switchLine(1);
+        switch2.addLine(railLine3.getConnectorA(), railLine0.getConnectorB(), world);
+        //switch1.switchLine(1);
 
         loco = new Locomotive(railLine1.getConnectorA(), RailLine.Direction.Outside, world);
         loco.create();
-        //loco.setSpeed(30f);
+        loco.setSpeed(30f);
         loco.setMaxSpeed(30f);
         loco.setAcceleration(0.5f, Locomotive.AccelerationType.MoveForward);
         loco.addChangeRailLineListener(this);
@@ -270,7 +277,11 @@ public class Hello3dWorld implements IChangeRailLineListener
             return;
 
         if (loco.getRailLine() == railLine3)
+        {
             loco.setAcceleration(5f, Locomotive.AccelerationType.MoveBackward);
+            switch2.switchLine(1);
+            switch1.switchLine(1);
+        }
         if (loco.getRailLine() == railLine1)
             loco.setAcceleration(5f, Locomotive.AccelerationType.Breaking);
     }
